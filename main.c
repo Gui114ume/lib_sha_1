@@ -25,9 +25,8 @@ int main(int argc, char** argv)
     unsigned long long file_size = GetSize(argv[1]);
     MsgPadding(fp, file_size);
     FILE* fptr = fopen(argv[1],"rb");
-    //int s = ftell(fptr);
-    //printf("%d\n",s);
-    while( nb = fread(buffer, 1, 512/8, fptr) ) // ne rentre pas ici etrange
+
+    while( nb = fread(buffer, 1, 512/8, fptr) )
     {
         Divide_M_InWord(buffer, W);
         for(int t = 16 ; t < 80 ; t++)
@@ -47,5 +46,8 @@ int main(int argc, char** argv)
     RES[0] = H0; RES[1] = H1; RES[2] = H2; RES[3] = H3; RES[4] = H4;
 
     BinToHexString(RES,hash);
+    RemoveAddedBytes(fptr,file_size);
+
+    fclose(fptr);
     return 1;
 }

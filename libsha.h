@@ -48,3 +48,6 @@ WORD_t K(unsigned int t);
 
 void Divide_M_InWord(unsigned char* buffer,
                      WORD_t* W);
+
+void RemoveAddedBytes(FILE* fptr,
+                      unsigned long long size);

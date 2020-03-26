@@ -168,3 +168,10 @@ void Divide_M_InWord(unsigned char* buffer,
     }
     return (void)0;
 }
+
+void RemoveAddedBytes(FILE* fptr,
+                      unsigned long long size)
+{
+    int fd = fileno(fptr);
+    ftruncate(fd, size);
+}
