@@ -47,7 +47,10 @@ int main(int argc, char** argv)
 
     BinToHexString(RES,hash);
     RemoveAddedBytes(fptr,file_size);
+<<<<<<< HEAD
 
     fclose(fptr);
+=======
+>>>>>>> eda682882c72041758ea3ab0f3e8b1e45764fc9d
     return 1;
 }
