@@ -21,7 +21,7 @@ unsigned int MsgPadding(FILE* fptr,
 {
     //fptr est deja ouvert ici
     unsigned long long* r = malloc(sizeof(unsigned long long));
-    *r = file_size;
+    *r = file_size * 8;
 
     //reflechir a tous les cas possibles lors du padding
     if( (file_size * 8)%512 == 0 )
@@ -33,7 +33,7 @@ unsigned int MsgPadding(FILE* fptr,
         // add 0x80, puis des 0x00, puis file_size
         fwrite(buffer, 1, 448/8,fptr);
         for(int i = 0 ; i < 8 ; i++)
-            fwrite( (char*)r + i, 1, 1, fptr);
+            fwrite( (char*)r + 7 - i, 1, 1, fptr); // sur que le fwrite fait pas ce que je veux ici
         fclose(fptr);
         return 448/8;
 
@@ -142,12 +142,12 @@ WORD_t K(unsigned int t)
     }
 
 }
-void Divide_M_InWord(unsigned char* buffer,
+void Divide_M_InWord(unsigned char* buffer, // a tester ! FOnctionne mais est ce le resultat que j'attends ?
                      WORD_t* W)
 {
-    for(int i = 0; i < 16 * 4 ;)
+    for(int i = 0,j = 0; i < 16 * 4 ; j++)
     {
-        W[i] = (unsigned int)(buffer[i] << 24) ^ (unsigned int)(buffer[i + 1] << 16) ^ (unsigned int)(buffer[i + 2] << 8) ^ (unsigned int)(buffer[i + 3]);
+        W[j] = (unsigned int)(buffer[i] << 24) ^ (unsigned int)(buffer[i + 1] << 16) ^ (unsigned int)(buffer[i + 2] << 8) ^ (unsigned int)(buffer[i + 3]);
         i += 4;
     }
     return (void)0;
