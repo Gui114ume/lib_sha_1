@@ -1,5 +1,5 @@
 /*
- *   Librairie pour SHA-1
+ *   Librairie pour SHA-1 : RFC 3174 Méthode 1
  *
  *
  */
@@ -30,24 +30,36 @@ unsigned int MsgPadding(FILE* fptr,
         buffer[0] = 1 << 7;
         for(int i = 1 ; i < 448/8; i++)
             buffer[i] = 0;
-        // add 0x80, puis des 0x00, puis file_size
+
         fwrite(buffer, 1, 448/8,fptr);
         for(int i = 0 ; i < 8 ; i++)
-            fwrite( (char*)r + 7 - i, 1, 1, fptr); // sur que le fwrite fait pas ce que je veux ici
+            fwrite( (char*)r + 7 - i, 1, 1, fptr);
         fclose(fptr);
         return 448/8;
 
     }
-    else if ( (file_size + 1)%512 >= 448 )
+    else if ( (file_size * 8 )%512 >= 448 ) //chevauchement de bloc
     {
         //on padd avec 1, puis des 0 afin de finir le bloc de 512. Ensuite on crée un nouveau bloc de 512 avec des 0, puis on padd avec file_size en binaire.
-
+        return 0;
     }
     //ajouter un bit à 1
     //ajouter des zeros jusqu'a ce qu'il ne reste plus que 64 bits pour faire un bloc de 512 bits complet
     //ajouter file_size en tant que u64
+    else if ( (file_size * 8 )%512 < 448 )
+    {
+        //on rempli le bloc avec 0x80 puis on ecrit file_size
+        unsigned char* buffer = malloc(sizeof(unsigned char) * (512/8 - (file_size * 8)%512 / 8) - 8);
+        buffer[0] = 1 << 7;
+        for(int i = 1 ; i < (512/8 -  (file_size * 8)%512 / 8 ) - 8 ; i++ )
+            buffer[i] = 0;
 
-    //padding à faire !
+        fwrite(buffer, 1, ( (512/8 - (file_size * 8)%512 / 8 ) - 8 ),fptr);
+        for(int i = 0 ; i < 8 ; i++)
+            fwrite( (char*)r + 7 - i, 1, 1, fptr);
+        fclose(fptr);
+        return 0;
+    }
     return 0;
 }
 
@@ -81,13 +93,17 @@ void BinToHexString(WORD_t* res_word,
     {
         sprintf(hash + i * 8 * sizeof(char),"%x", res_word[i]);
     }
-    printf("%s\n",hash);
+
+    for(int i = 0; i < 40 ; i++)
+        printf("%c",hash[i]);
+
+    printf("\n");
     return (void)0;
 }
 
 unsigned long long GetSize(char* filename)
 {
-    //lstat pour avoir la taille en octet, convertir en bits
+    //lstat pour avoir la taille en octet
     struct stat* stat_buf = malloc(sizeof(struct stat));
     stat(filename, stat_buf);
     return  (stat_buf->st_size);
@@ -142,7 +158,7 @@ WORD_t K(unsigned int t)
     }
 
 }
-void Divide_M_InWord(unsigned char* buffer, // a tester ! FOnctionne mais est ce le resultat que j'attends ?
+void Divide_M_InWord(unsigned char* buffer,
                      WORD_t* W)
 {
     for(int i = 0,j = 0; i < 16 * 4 ; j++)
