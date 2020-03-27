@@ -52,8 +52,8 @@ int main(int argc, char** argv)
 
     BinToHexString(RES,hash);
     fclose(fptr);
-    FILE* fpointer = fopen(argv[1],"wb");
-    RemoveAddedBytes(fpointer,file_size);
+    FILE* fpointer = fopen(argv[1],"a");
+    RemoveAddedBytes(fpointer,file_size); // remet le fichier a la bonne taille, mais rempli de zéro !! fuck !
     fclose(fpointer);
 
     return 1;
