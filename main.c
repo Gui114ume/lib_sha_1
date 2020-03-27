@@ -54,6 +54,7 @@ int main(int argc, char** argv)
     fclose(fptr);
     FILE* fpointer = fopen(argv[1],"wb");
     RemoveAddedBytes(fpointer,file_size);
+    fclose(fpointer);
 
     return 1;
 }

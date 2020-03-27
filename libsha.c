@@ -42,7 +42,24 @@ unsigned int MsgPadding(FILE* fptr,
     {
         //on padd avec 1, puis des 0 afin de finir le bloc de 512. Ensuite on crée un nouveau bloc de 512 avec des 0, puis on padd avec file_size en binaire.
         // a ecrire
-        return 0;
+        unsigned char* buffer = malloc(sizeof(unsigned char) * (512/8 - (file_size * 8)%512 / 8) );
+        buffer[0] = 1 << 7;
+        for(int i = 1 ; i < (512/8 -  (file_size * 8)%512 / 8 ); i++ )
+            buffer[i] = 0;
+
+        fwrite(buffer, 1, ( (512/8 - (file_size * 8)%512 / 8 )),fptr);
+
+        unsigned char* buff = malloc(sizeof(unsigned char) * 448 / 8);
+        buff[0] = 0;
+        for(int i = 1 ; i < 448/8; i++)
+            buff[i] = 0;
+
+        fwrite(buff, 1, 448/8,fptr);
+        for(int i = 0 ; i < 8 ; i++)
+            fwrite( (char*)r + 7 - i, 1, 1, fptr);
+        fclose(fptr);
+        return 448/8;
+
     }
     //ajouter un bit à 1
     //ajouter des zeros jusqu'a ce qu'il ne reste plus que 64 bits pour faire un bloc de 512 bits complet
@@ -90,7 +107,10 @@ void BinToHexString(WORD_t* res_word,
 {
     // res_word contient 5 mots de 32 bits, soit 160 bits
     // hash est une chaine de 5 mots, soit 5 * 8 chars
+
     // il y a un problème à l'affichage sinon tout va bien !
+    // il faut directement fait printf( " %x " ), mais 4 bits par 4 bits ou un truc de ce style
+
     for(int i = 0 ; i < 5 ; i++)
     {
         sprintf(hash + i * 8 * sizeof(char),"%x", res_word[i]);
