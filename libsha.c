@@ -41,6 +41,7 @@ unsigned int MsgPadding(FILE* fptr,
     else if ( (file_size * 8 )%512 >= 448 ) //chevauchement de bloc
     {
         //on padd avec 1, puis des 0 afin de finir le bloc de 512. Ensuite on crée un nouveau bloc de 512 avec des 0, puis on padd avec file_size en binaire.
+        // a ecrire
         return 0;
     }
     //ajouter un bit à 1
@@ -89,14 +90,13 @@ void BinToHexString(WORD_t* res_word,
 {
     // res_word contient 5 mots de 32 bits, soit 160 bits
     // hash est une chaine de 5 mots, soit 5 * 8 chars
+    // il y a un problème à l'affichage sinon tout va bien !
     for(int i = 0 ; i < 5 ; i++)
     {
         sprintf(hash + i * 8 * sizeof(char),"%x", res_word[i]);
     }
-
     for(int i = 0; i < 40 ; i++)
-        printf("%c",hash[i]);
-
+        printf("%c",hash[i]); //n'affiche pas le 0 s'il est en premiere position (hash[0]) !! incomprehension totale
     printf("\n");
     return (void)0;
 }
@@ -173,5 +173,16 @@ void RemoveAddedBytes(FILE* fptr,
                       unsigned long long size)
 {
     int fd = fileno(fptr);
-    ftruncate(fd, size);
+    if(fd == -1)
+    {
+        perror("error fileno()\n");
+        exit(-1);
+    }
+    int code = ftruncate(fd, size);
+    //ftruncate echoue et renvoie -1
+    if(code == -1)
+    {
+        perror("error ftruncate\n");
+        exit(-1);
+    }
 }

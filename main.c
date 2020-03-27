@@ -10,6 +10,11 @@
 //on ne hash que des fichiers pour le moment
 int main(int argc, char** argv)
 {
+    if(argc < 2)
+    {
+        printf("usage : %s [file name]\n",argv[0]);
+        exit(-1);
+    }
     //H0 H1 H2 H3 H4 defini dans libsha.h
     WORD_t A, B, C, D, E, TEMP;
     size_t nb = 0;
@@ -46,8 +51,9 @@ int main(int argc, char** argv)
     RES[0] = H0; RES[1] = H1; RES[2] = H2; RES[3] = H3; RES[4] = H4;
 
     BinToHexString(RES,hash);
-    RemoveAddedBytes(fptr,file_size);
-
     fclose(fptr);
+    FILE* fpointer = fopen(argv[1],"wb");
+    RemoveAddedBytes(fpointer,file_size);
+
     return 1;
 }
