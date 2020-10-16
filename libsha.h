@@ -4,6 +4,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
+#include <math.h>
+
 
 #define _FILE_OFFSET_BITS 64
 
